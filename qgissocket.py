@@ -6,8 +6,12 @@ import select
 
 from PyQt4.QtGui import QApplication
 from PyQt4.QtCore import QThread, QObject, pyqtSignal
+from qgis.core import QgsVectorLayer, QgsMapLayerRegistry
 
-from utils import send_one_message, recv_one_message
+import json
+import struct
+
+from utils import recv_one_message, send_one_message
 
 class Worker(QObject):
     message = pyqtSignal(dict)
@@ -37,6 +41,8 @@ def result(data):
     command = data["command"]
     if command == "new-layer":
         print("Making new layer...")
+        layer = QgsVectorLayer(data["type"], data["name"], "memory")
+        QgsMapLayerRegistry.instance().addMapLayer(layer)
     elif command == "refresh-layer":
         print("Refreshing layer...")
     else:

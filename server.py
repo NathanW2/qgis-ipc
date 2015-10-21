@@ -1,6 +1,7 @@
 import struct
 import socket
 import json
+import time
 
 from utils import recv_one_message, send_one_message
 
@@ -23,32 +24,25 @@ if recieved == "Hello qgis":
 
     data = dict(command="new-layer",
                 name="my layer",
-                type="point"
+                type="Point?crs=epsg:4326"
                 )
     send_one_message(client, data)
 
-    data = dict(command="refresh-layer")
-    send_one_message(client, data)
-
+    time.sleep(1.2)
     data = dict(command="other")
     send_one_message(client, data)
 
-    # Send more commands.
+    time.sleep(1.2)
+    data = dict(command="new-layer",
+                name="my layer 2",
+                type="Linestring?crs=epsg:4326"
+    )
+    send_one_message(client, data)
 
-# We just wait here until we are killed.
-while True:
+try:
+    socket.shutdown(socket.SHUT_RDWR)
+except:
     pass
 
-import atexit
-
-def cleanup():
-    # shutdown the socket
-    try:
-        socket.shutdown(socket.SHUT_RDWR)
-    except:
-        pass
-
-    socket.close()
-
-atexit.register(cleanup)
+socket.close()
 
